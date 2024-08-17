@@ -18,7 +18,7 @@ double electricChargeSum = 0;
 
 Ticker getDataTicker(getINA226Data, 250, 0);
 Ticker updateOledTicker(updateOled, 60, 0);
-Ticker integrationTicker(ChargeIntegration,3,0);
+Ticker integrationTicker(ChargeIntegration, 3, 0);
 Adafruit_ssd1306syp display(SDA_PIN, SCL_PIN);
 INA226 INA(0x40);
 
@@ -104,12 +104,23 @@ void updateOled()
     }
     display.setCursor(8, 41);
     display.print("Charge: ");
-    display.print(electricChargeSum);
+    if (electricChargeSum < 10000)
+    {
+        display.print(electricChargeSum);
+    }
+    else
+    {
+        display.print(electricChargeSum / 10000);
+        display.print("E4");
+    }
     display.print("C");
     display.update();
     display.clear();
 }
 
-void ChargeIntegration(){
-    electricChargeSum += INA_Current_A * dt;
+int t = millis();
+void ChargeIntegration()
+{
+    electricChargeSum += INA_Current_A * (millis() - t) / 1000;
+    t = millis();
 }
